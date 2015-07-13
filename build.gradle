@@ -1,0 +1,60 @@
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    configurations { providedCompile }
+    sourceSets.main.compileClasspath += configurations.providedCompile
+    sourceSets.test.compileClasspath += configurations.providedCompile
+    sourceSets.test.runtimeClasspath += configurations.providedCompile
+}
+
+project('module1') {
+    apply plugin: 'ear'
+    ear {
+        destinationDir = rootProject.projectDir
+        baseName = project.name
+        dependencies {
+            deploy project(':module1:ejb')
+        }
+        deploymentDescriptor {
+            applicationName = project.name
+            displayName = project.name
+        }
+    }
+}
+
+project('module1:ejb') {
+    dependencies {
+        providedCompile "org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final"
+        providedCompile "org.hibernate:hibernate-core:4.3.7.Final"
+        providedCompile "org.hibernate:hibernate-entitymanager:4.3.7.Final"
+    }
+}
+
+project('module2') {
+    apply plugin: 'ear'
+    ear {
+        destinationDir = rootProject.projectDir
+        baseName = project.name
+        dependencies {
+            deploy project(':module2:ejb')
+        }
+        deploymentDescriptor {
+            applicationName = project.name
+            displayName = project.name
+        }
+    }
+}
+
+project('module2:ejb') {
+    dependencies {
+        providedCompile "org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final"
+        providedCompile "org.hibernate:hibernate-core:4.3.7.Final"
+        providedCompile "org.hibernate:hibernate-entitymanager:4.3.7.Final"
+    }
+}
