@@ -1,25 +1,23 @@
 allprojects {
     repositories {
-        mavenCentral()
+        mavenLocal()
+        jcenter()
     }
 }
 
 subprojects {
     apply plugin: 'java'
-
-    configurations { providedCompile }
-    sourceSets.main.compileClasspath += configurations.providedCompile
-    sourceSets.test.compileClasspath += configurations.providedCompile
-    sourceSets.test.runtimeClasspath += configurations.providedCompile
 }
 
 project('module1') {
     apply plugin: 'ear'
+    apply from: '../deploy.gradle'
     ear {
-        destinationDir = rootProject.projectDir
+        //destinationDir = rootProject.projectDir
         baseName = project.name
         dependencies {
             deploy project(':module1:ejb')
+            deploy project(path: ':module1:app1', configuration:'archives')
         }
         deploymentDescriptor {
             applicationName = project.name
@@ -29,20 +27,31 @@ project('module1') {
 }
 
 project('module1:ejb') {
+    apply from: '../../for-ear.gradle'
     dependencies {
+        providedCompile 'javax:javaee-api:7.0'
         providedCompile "org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final"
         providedCompile "org.hibernate:hibernate-core:4.3.7.Final"
         providedCompile "org.hibernate:hibernate-entitymanager:4.3.7.Final"
     }
 }
 
+project('module1:app1') {
+    apply plugin: 'war'
+    dependencies {
+        providedCompile 'javax:javaee-api:7.0'
+    }
+}
+
 project('module2') {
     apply plugin: 'ear'
+    apply from: '../deploy.gradle'
     ear {
-        destinationDir = rootProject.projectDir
+        //destinationDir = rootProject.projectDir
         baseName = project.name
         dependencies {
             deploy project(':module2:ejb')
+            deploy project(path:':module2:app2', configuration:'archives')
         }
         deploymentDescriptor {
             applicationName = project.name
@@ -52,9 +61,17 @@ project('module2') {
 }
 
 project('module2:ejb') {
+    apply from: '../../for-ear.gradle'
     dependencies {
         providedCompile "org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final"
         providedCompile "org.hibernate:hibernate-core:4.3.7.Final"
         providedCompile "org.hibernate:hibernate-entitymanager:4.3.7.Final"
+    }
+}
+
+project('module2:app2') {
+    apply plugin: 'war'
+    dependencies {
+        providedCompile 'javax:javaee-api:7.0'
     }
 }

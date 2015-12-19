@@ -1,0 +1,6 @@
+task deploy(type: Copy) {
+    dependsOn ear
+    from "$buildDir/libs"
+    include "*.ear"
+    into "$wildflyHome/standalone/deployments"
+}
